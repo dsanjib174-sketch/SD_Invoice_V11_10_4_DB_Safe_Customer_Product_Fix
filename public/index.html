@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SD Invoice V11.10.4 DB Safe Customer Product Fix</title>
+<title>SD Invoice V11.10.5 Direct Master Save Fix</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 body{font-family:Arial;margin:0;background:#eef4fb;color:#07152a}.login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#12375c;padding:24px}.card{background:#fff;border:1px solid #cbd5e1;border-radius:16px;padding:18px;margin-bottom:16px}.login .card{max-width:760px;width:100%;padding:28px}header{background:#0f3157;color:#fff;padding:16px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1500px;margin:auto;padding:18px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tab,button{border:0;background:#0f3157;color:#fff;padding:10px 14px;border-radius:9px;font-weight:700;cursor:pointer}.tab{background:#dbeafe;color:#111}.tab.on{background:#0f3157;color:#fff}.sec{display:none}.sec.on{display:block}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.sum{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.box{background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:12px}.box b{display:block;font-size:22px}input,select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box;margin-top:4px}label{font-size:13px;font-weight:700}table{width:100%;border-collapse:collapse}td,th{border:1px solid #cbd5e1;padding:8px;font-size:13px;vertical-align:top}th{background:#eaf1ff}.ok{background:#15803d}.warn{background:#b45309}.bad{background:#b91c1c}.gray{background:#475569}.logo{max-height:58px;max-width:180px;background:#fff;border-radius:8px;padding:3px}.note{background:#fff7ed;border:1px solid #fdba74;color:#9a3412;padding:12px;border-radius:12px;margin-bottom:16px}#app{display:none}@media(max-width:900px){.grid,.sum{grid-template-columns:1fr}header{display:block}}
@@ -11,7 +11,7 @@ body{font-family:Arial;margin:0;background:#eef4fb;color:#07152a}.login{min-heig
 <body>
 <div id="login" class="login">
 <div class="card">
-<h1>SD Invoice V11.10.4 DB Safe Customer Product Fix</h1>
+<h1>SD Invoice V11.10.5 Direct Master Save Fix</h1>
 <p><b>Super Admin:</b> superadmin / admin123</p>
 <p><b>Demo Client:</b> demo@sdinvoice.com / admin / 1234</p>
 <label>Login Type</label><select id="loginType" onchange="setDefaults()"><option>Super Admin</option><option>Client</option></select>
@@ -34,7 +34,7 @@ body{font-family:Arial;margin:0;background:#eef4fb;color:#07152a}.login{min-heig
 </div>
 
 <div id="app">
-<header><div><img id="topLogo" class="logo" style="display:none"><h2>SD Invoice V11.10.4 DB Safe Customer Product Fix</h2></div><button class="bad" onclick="location.reload()">Logout</button></header>
+<header><div><img id="topLogo" class="logo" style="display:none"><h2>SD Invoice V11.10.5 Direct Master Save Fix</h2></div><button class="bad" onclick="location.reload()">Logout</button></header>
 <div class="wrap">
 <div class="note"><b>Stable Release:</b> stable full release with professional invoice print/download format.</div>
 <div class="tabs" id="tabs"></div>
@@ -104,7 +104,7 @@ body{font-family:Arial;margin:0;background:#eef4fb;color:#07152a}.login{min-heig
 <div class="grid"><input id="vName" placeholder="Customer"><input id="vGstin" placeholder="GSTIN" oninput="autoCustomerStateCode()"><input id="vPan" placeholder="PAN"><input id="vPhone" placeholder="Phone"></div>
 <div class="grid"><input id="vEmail" placeholder="Email"><input id="vState" placeholder="Bill To State"><input id="vStateCode" placeholder="State Code"><input id="vDue" type="number" value="15"></div>
 <div class="grid"><input id="vAddress" placeholder="Bill To Address"><input id="vShipName" placeholder="Ship To Name"><input id="vShipAddress" placeholder="Ship To Address"><input id="vShipState" placeholder="Ship To State"></div>
-<div class="grid"><input id="vShipStateCode" placeholder="Ship To State Code"><button class="ok" onclick="createCustomer()">Save Customer</button></div></div>
+<div class="grid"><input id="vShipStateCode" placeholder="Ship To State Code"><button class="ok" onclick="createCustomerDirect()">Save Customer</button></div></div>
 <div class="card"><h2>Product Master</h2>
 <div class="grid">
 <input id="pName" placeholder="Product / Service Name">
@@ -112,7 +112,7 @@ body{font-family:Arial;margin:0;background:#eef4fb;color:#07152a}.login{min-heig
 <input id="pPrice" type="number" placeholder="Rate">
 <input id="pGst" type="number" placeholder="GST %" value="18">
 </div>
-<button class="ok" onclick="createProduct()">Save Product</button> <button class="gray" onclick="checkMasterSchema()">Check Master Debug</button>
+<button class="ok" onclick="createProductDirect()">Save Product</button> <button class="gray" onclick="checkMasterSchema()">Check Master Debug</button>
 </div>
 <div class="card"><table><tbody id="masterTable"></tbody></table></div><div class="card"><h2>Product List</h2><table><thead><tr><th>Name</th><th>HSN</th><th>Rate</th><th>GST</th></tr></thead><tbody id="productListTable"></tbody></table></div>
 
