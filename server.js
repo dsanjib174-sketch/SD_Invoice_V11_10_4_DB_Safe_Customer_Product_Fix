@@ -12,7 +12,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'sd_invoice_v11_stable_secret';
-const db = new Database('sd_invoice_v11_10_4_db_safe_customer_product_fix.db');
+const db = new Database('sd_invoice_v11_10_5_direct_master_save_fix.db');
 
 app.use(helmet({ contentSecurityPolicy:false }));
 app.use(cors());
@@ -621,6 +621,44 @@ app.get('/api/debug/master-schema',auth,clientOnly,(req,res)=>{
   }catch(e){ res.status(500).json({error:e.message}); }
 });
 
+
+app.post('/api/direct/customers',auth,clientOnly,(req,res)=>{
+  try{
+    const d=req.body||{};
+    const name=String(d.name||'').trim();
+    if(!name) return res.status(400).json({error:'Customer name is required'});
+    if(!req.user.clientId) return res.status(400).json({error:'Client context missing. Please logout and login again.'});
+    try{ ensureCustomerColumns(); }catch(e){}
+    const gstin=String(d.gstin||'').trim();
+    const state=String(d.state||'').trim();
+    const address=String(d.address||'').trim();
+    const stateCode=String(d.state_code||stateCodeFromGstin(gstin)||'').trim();
+    db.prepare(`INSERT INTO customers
+      (client_id,name,gstin,state,mobile,email,address,due_days,pan,phone,state_code,shipping_name,shipping_address,shipping_state,shipping_state_code)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      .run(req.user.clientId,name,gstin,state,String(d.mobile||d.phone||'').trim(),String(d.email||'').trim(),address,Number(d.due_days||15),String(d.pan||'').trim(),String(d.phone||d.mobile||'').trim(),stateCode,String(d.shipping_name||name).trim(),String(d.shipping_address||address).trim(),String(d.shipping_state||state).trim(),String(d.shipping_state_code||stateCode||'').trim());
+    res.json({success:true,message:'Customer saved successfully by direct save'});
+  }catch(err){
+    console.error('DIRECT_CUSTOMER_SAVE_ERROR:',err&&err.stack?err.stack:err);
+    res.status(500).json({error:'Direct customer save failed: '+err.message});
+  }
+});
+app.post('/api/direct/products',auth,clientOnly,(req,res)=>{
+  try{
+    const d=req.body||{};
+    const name=String(d.name||'').trim();
+    if(!name) return res.status(400).json({error:'Product name is required'});
+    if(!req.user.clientId) return res.status(400).json({error:'Client context missing. Please logout and login again.'});
+    try{ ensureProductColumns(); }catch(e){}
+    db.prepare(`INSERT INTO products (client_id,name,hsn,price,gst,unit) VALUES (?,?,?,?,?,?)`)
+      .run(req.user.clientId,name,String(d.hsn||'').trim(),Number(d.price||0),Number(d.gst||0),String(d.unit||'Nos').trim()||'Nos');
+    res.json({success:true,message:'Product saved successfully by direct save'});
+  }catch(err){
+    console.error('DIRECT_PRODUCT_SAVE_ERROR:',err&&err.stack?err.stack:err);
+    res.status(500).json({error:'Direct product save failed: '+err.message});
+  }
+});
+
 app.get('/api/customers',auth,clientOnly,(req,res)=>{
   const rows=db.prepare("SELECT * FROM customers WHERE client_id=? ORDER BY id DESC").all(req.user.clientId);
   res.json(rows);
@@ -975,4 +1013,4 @@ app.get('/api/login-history',auth,(req,res)=>{
 
 app.get('/api/audit',auth,(req,res)=>res.json(db.prepare("SELECT * FROM audit_logs ORDER BY id DESC LIMIT 200").all()));
 app.get('*',(req,res)=>res.sendFile(path.join(__dirname,'public','index.html')));
-app.listen(PORT,()=>console.log('SD Invoice V11.10.4 DB Safe Customer Product Fix'+PORT));
+app.listen(PORT,()=>console.log('SD Invoice V11.10.5 Direct Master Save Fix'+PORT));
